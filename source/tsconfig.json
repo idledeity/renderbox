@@ -1,0 +1,22 @@
+{
+   "compilerOptions": {
+      "outDir": "../out",
+      "baseUrl": ".",
+      "target": "es6",
+      "module": "es6",
+      "declaration": true,
+      "sourceMap": true,
+      "noImplicitAny": true,
+      "experimentalDecorators": true,
+      "noImplicitReturns": true,
+      "noUnusedLocals": true,
+      "noImplicitThis": true,
+      "alwaysStrict": true,
+      "strictBindCallApply": true,
+      "strictNullChecks": true,
+      "forceConsistentCasingInFileNames": true
+   },
+   "include": [
+      "../source/**/*"
+   ]
+}
