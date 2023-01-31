@@ -1,11 +1,11 @@
 import Vector2 from "math/vector/vector2.js";
 import ColorRGB32 from "../color.js";
-import ShaderProgram from "../shader/shader_program.js";
-import RenderContext from "./render_context.js";
+import OpenGLContext from "./open_gl/open_gl_context.js";
+import OpenGLShaderProgram from "./open_gl/open_gl_shader_program.js";
 
 export default abstract class Renderer
 {
-   private _context: RenderContext;
+   private _context: OpenGLContext;
 
    /**
     * Constructor
@@ -15,15 +15,15 @@ export default abstract class Renderer
       this._context = this.makeContext(canvasElement);
    }
 
-   get context(): RenderContext {
+   get context(): OpenGLContext {
       return this._context;
    }
    
-   abstract makeContext(canvasElement: HTMLCanvasElement): RenderContext;
+   abstract makeContext(canvasElement: HTMLCanvasElement): OpenGLContext;
 
    abstract beginFrame(): void;
 
-   abstract createProgram(vertShaderSource: string, fragShaderSource: string): ShaderProgram | null;
+   abstract createProgram(vertShaderSource: string, fragShaderSource: string): OpenGLShaderProgram | null;
    
    abstract drawTriangle2D(point1: Vector2, point2: Vector2, point3: Vector2, color: ColorRGB32): void;
 }

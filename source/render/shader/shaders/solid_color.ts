@@ -1,9 +1,9 @@
-import ShaderProgram from "../shader_program.js"
 import { requestFileBlocking } from "../../../system/file/file.js";
 import Renderer from "render/renderer/renderer.js";
+import OpenGLShaderProgram from "render/renderer/open_gl/open_gl_shader_program.js";
 
 export default class SolidColorShader {
-   private _shader: ShaderProgram | null;
+   private _shader: OpenGLShaderProgram | null;
    
    constructor() {
    }
@@ -25,7 +25,7 @@ export default class SolidColorShader {
       return true;
    }
    
-   get shader(): ShaderProgram | null {
+   get shader(): OpenGLShaderProgram | null {
       return this._shader;
    }
 }

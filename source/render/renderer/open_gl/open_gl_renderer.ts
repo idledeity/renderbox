@@ -1,10 +1,8 @@
 import OpenGLContext from "./open_gl_context.js"
 import OpenGLShader from "./open_gl_shader.js";
 import Renderer from "../renderer.js"
-import Shader from "../../shader/shader.js";
-import ShaderProgram from "../../shader/shader_program.js";
 import SolidColorShader from "../../shader/shaders/solid_color.js";
-import OpenGLShaderProgram from "./open_gl_shader_program..js";
+import OpenGLShaderProgram from "./open_gl_shader_program.js";
 import Vector2 from "math/vector/vector2.js";
 import ColorRGB32 from "render/color.js";
 
@@ -41,20 +39,20 @@ export default class OpenGLRenderer extends Renderer
       this.gl.clear(this.gl.COLOR_BUFFER_BIT);
    }
    
-   createShader(): Shader
+   createShader(): OpenGLShaderProgram
    {
-      return new OpenGLShader();
+      return new OpenGLShaderProgram();
    }
 
-   createProgram(vertShaderSource: string, fragShaderSource: string): ShaderProgram | null
+   createProgram(vertShaderSource: string, fragShaderSource: string): OpenGLShaderProgram | null
    {
       let success = true;
 
       // Create the vertex and fragment shaders
       let vertShader = new OpenGLShader();
-      success = vertShader.initialize(vertShaderSource, Shader.Type.VERTEX, this.context);
+      success = vertShader.initialize(vertShaderSource, OpenGLShader.Type.VERTEX, this.context);
       let fragShader = new OpenGLShader();
-      success = success && fragShader.initialize(fragShaderSource, Shader.Type.FRAGMENT, this.context);
+      success = success && fragShader.initialize(fragShaderSource, OpenGLShader.Type.FRAGMENT, this.context);
 
       // Create the program from the shaders
       let newProgram = new OpenGLShaderProgram();

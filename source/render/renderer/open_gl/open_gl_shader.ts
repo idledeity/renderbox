@@ -1,33 +1,38 @@
 
 import OpenGLContext from "./open_gl_context.js";
-import Shader from "../../shader/shader.js";
-import RenderContext from "render/renderer/render_context.js";
 
-
-export default class OpenGLShader extends Shader
-{
+class OpenGLShader {
+   private _type: OpenGLShader.Type;
    private _gl_shader: WebGLShader | null;
 
    constructor() {
-      super();
+      this._type = OpenGLShader.Type.NONE;
       this._gl_shader = null;
    }
+   
+   get type(): OpenGLShader.Type {
+      return this._type;
+   }
+   
+   get gl_shader(): WebGLShader | null {
+      return this._gl_shader;
+   }
 
-   initialize(source: string, shaderType: Shader.Type, context: RenderContext): boolean
+   initialize(source: string, shaderType: OpenGLShader.Type, context: OpenGLContext): boolean
    {
       this.release(context);
       
       let GLcontext = context as OpenGLContext;
 
       // Create a new GL shader
-      this.type = shaderType;
+      this._type = shaderType;
       switch(this.type)
       {
-         case Shader.Type.VERTEX: {
+         case OpenGLShader.Type.VERTEX: {
             this._gl_shader = GLcontext.gl.createShader(GLcontext.gl.VERTEX_SHADER);;
             break;
          }
-         case Shader.Type.FRAGMENT: {
+         case OpenGLShader.Type.FRAGMENT: {
             this._gl_shader = GLcontext.gl.createShader(GLcontext.gl.FRAGMENT_SHADER);
             break;
          }
@@ -51,19 +56,23 @@ export default class OpenGLShader extends Shader
       return success;
    }
 
-   release(context: RenderContext)
+   release(context: OpenGLContext)
    {
-      let contextGL = context as OpenGLContext;
-      
       if (this._gl_shader != null)
       {
-         contextGL.gl.deleteShader(this._gl_shader);
+         context.gl.deleteShader(this._gl_shader);
       }
       this._gl_shader = null;
-      this.type = Shader.Type.NONE;
-   }
-   
-   get gl_shader(): WebGLShader | null {
-      return this._gl_shader;
+      this._type = OpenGLShader.Type.NONE;
    }
 }
+
+namespace OpenGLShader {
+   export enum Type {
+      VERTEX,
+      FRAGMENT,
+      NONE,
+   }
+}
+
+export default OpenGLShader;
