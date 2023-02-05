@@ -2,13 +2,15 @@ import OpenGLContext from "./open_gl_context.js"
 import OpenGLShader from "./open_gl_shader.js";
 import Renderer from "../renderer.js"
 import SolidColorShader from "../../shader/shaders/solid_color.js";
+import VertexColorShader from "../../shader/shaders/vertex_color.js";
 import OpenGLShaderProgram from "./open_gl_shader_program.js";
 import Vector2 from "math/vector/vector2.js";
 import ColorRGB32 from "render/color.js";
 
 export default class OpenGLRenderer extends Renderer
 {
-   private _solidColorProgram: SolidColorShader;
+   private _solidColorShader: SolidColorShader;
+   private _vertexColorShader: VertexColorShader;
    
    /**
     * Constructor
@@ -17,16 +19,23 @@ export default class OpenGLRenderer extends Renderer
    constructor(canvasElement: HTMLCanvasElement) {
       super(canvasElement);
       
-      this._solidColorProgram = new SolidColorShader();
-      this._solidColorProgram.initialize(this);
+      this._solidColorShader = new SolidColorShader();
+      this._solidColorShader.initialize(this);
+      
+      this._vertexColorShader = new VertexColorShader();
+      this._vertexColorShader.initialize(this);
    }
 
    get gl(): WebGLRenderingContext {
       return (this.context as OpenGLContext).gl;
    }
    
-   get solidColorProgram(): SolidColorShader {
-      return this._solidColorProgram;
+   get solidColorShader(): SolidColorShader {
+      return this._solidColorShader;
+   }
+   
+   get vertexColorShader(): VertexColorShader {
+      return this._vertexColorShader
    }
 
    makeContext(canvasElement: HTMLCanvasElement) {
@@ -61,16 +70,16 @@ export default class OpenGLRenderer extends Renderer
       return success ? newProgram : null;
    }
    
-   drawTriangle2D(point1: Vector2, point2: Vector2, point3: Vector2, color: ColorRGB32)
+   drawTriangle2D(verts: Vector2[], colors: ColorRGB32[])
    {
-      let gl_program = (this.solidColorProgram.shader as OpenGLShaderProgram).gl_program;
+      let gl_program = (this.vertexColorShader.shader as OpenGLShaderProgram).gl_program;
       if (gl_program) {
          this.gl.useProgram(gl_program);
          
          const positionArray = new Float32Array(2 * 3);
-         positionArray.set(point1.coords, 0);
-         positionArray.set(point2.coords, 2);
-         positionArray.set(point3.coords, 4);
+         positionArray.set(verts[0].coords, 0);
+         positionArray.set(verts[1].coords, 2);
+         positionArray.set(verts[2].coords, 4);
          
          let positionBuffer = this.gl.createBuffer();
          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
@@ -80,8 +89,18 @@ export default class OpenGLRenderer extends Renderer
          this.gl.enableVertexAttribArray(positionAttributeLocation);
          this.gl.vertexAttribPointer(positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
          
-         let colorUniformLocation = this.gl.getUniformLocation(gl_program, 'uVertColor');
-         this.gl.uniform4fv(colorUniformLocation, color.value);
+         const colorArray = new Float32Array(4 * 3);
+         colorArray.set(colors[0].values, 0);
+         colorArray.set(colors[1].values, 4);
+         colorArray.set(colors[2].values, 8);
+         
+         let colorBuffer = this.gl.createBuffer();
+         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
+         this.gl.bufferData(this.gl.ARRAY_BUFFER, colorArray, this.gl.STATIC_DRAW);
+         
+         let colorAttributeLocation = this.gl.getAttribLocation(gl_program, 'aVertColor');
+         this.gl.enableVertexAttribArray(colorAttributeLocation);
+         this.gl.vertexAttribPointer(colorAttributeLocation, 4, this.gl.FLOAT, false, 0, 0);
       
          // draw
          var primitiveType = this.gl.TRIANGLES;

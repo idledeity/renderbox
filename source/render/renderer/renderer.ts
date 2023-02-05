@@ -25,5 +25,5 @@ export default abstract class Renderer
 
    abstract createProgram(vertShaderSource: string, fragShaderSource: string): OpenGLShaderProgram | null;
    
-   abstract drawTriangle2D(point1: Vector2, point2: Vector2, point3: Vector2, color: ColorRGB32): void;
+   abstract drawTriangle2D(verts: Vector2[], colors: ColorRGB32[]): void;
 }

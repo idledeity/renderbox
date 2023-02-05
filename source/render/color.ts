@@ -11,7 +11,7 @@ export default class ColorRGB32 {
    public static readonly Blue = new ColorRGB32(0.0, 0.0, 1.0, 1.0);
 
    /**
-    * Create a new Vector2
+    * Create a new Color RGB32
     */
    constructor(color: ColorRGB32);
    constructor(r: number, g: number, b: number, a: number);
@@ -41,7 +41,7 @@ export default class ColorRGB32 {
       }
    }
    
-   get value() {
+   get values() {
       return this._values;
    }
    
