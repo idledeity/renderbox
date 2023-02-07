@@ -1,16 +1,15 @@
 import OpenGLContext from "./open_gl_context.js"
-import OpenGLShader from "./open_gl_shader.js";
 import Renderer from "../renderer.js"
-import SolidColorShader from "../../shader/shaders/solid_color.js";
-import VertexColorShader from "../../shader/shaders/vertex_color.js";
+import SolidColorProgram from "../../shader/shaders/solid_color.js";
+import VertexColorProgram from "../../shader/shaders/vertex_color.js";
 import OpenGLShaderProgram from "./open_gl_shader_program.js";
 import Vector2 from "math/vector/vector2.js";
 import ColorRGB32 from "render/color.js";
 
 export default class OpenGLRenderer extends Renderer
 {
-   private _solidColorShader: SolidColorShader;
-   private _vertexColorShader: VertexColorShader;
+   private _SolidColorProgram: SolidColorProgram;
+   private _VertexColorProgram: VertexColorProgram;
    
    /**
     * Constructor
@@ -19,23 +18,23 @@ export default class OpenGLRenderer extends Renderer
    constructor(canvasElement: HTMLCanvasElement) {
       super(canvasElement);
       
-      this._solidColorShader = new SolidColorShader();
-      this._solidColorShader.initialize(this);
+      this._SolidColorProgram = new SolidColorProgram();
+      this._SolidColorProgram.initialize(this.context);
       
-      this._vertexColorShader = new VertexColorShader();
-      this._vertexColorShader.initialize(this);
+      this._VertexColorProgram = new VertexColorProgram();
+      this._VertexColorProgram.initialize(this.context);
    }
 
    get gl(): WebGLRenderingContext {
       return (this.context as OpenGLContext).gl;
    }
    
-   get solidColorShader(): SolidColorShader {
-      return this._solidColorShader;
+   get SolidColorProgram(): SolidColorProgram {
+      return this._SolidColorProgram;
    }
    
-   get vertexColorShader(): VertexColorShader {
-      return this._vertexColorShader
+   get VertexColorProgram(): VertexColorProgram {
+      return this._VertexColorProgram
    }
 
    makeContext(canvasElement: HTMLCanvasElement) {
@@ -48,31 +47,9 @@ export default class OpenGLRenderer extends Renderer
       this.gl.clear(this.gl.COLOR_BUFFER_BIT);
    }
    
-   createShader(): OpenGLShaderProgram
-   {
-      return new OpenGLShaderProgram();
-   }
-
-   createProgram(vertShaderSource: string, fragShaderSource: string): OpenGLShaderProgram | null
-   {
-      let success = true;
-
-      // Create the vertex and fragment shaders
-      let vertShader = new OpenGLShader();
-      success = vertShader.initialize(vertShaderSource, OpenGLShader.Type.VERTEX, this.context);
-      let fragShader = new OpenGLShader();
-      success = success && fragShader.initialize(fragShaderSource, OpenGLShader.Type.FRAGMENT, this.context);
-
-      // Create the program from the shaders
-      let newProgram = new OpenGLShaderProgram();
-      success = success && newProgram.initialize([vertShader, fragShader], this.context);
-
-      return success ? newProgram : null;
-   }
-   
    drawTriangle2D(verts: Vector2[], colors: ColorRGB32[])
    {
-      let gl_program = (this.vertexColorShader.shader as OpenGLShaderProgram).gl_program;
+      let gl_program = (this.VertexColorProgram.shader as OpenGLShaderProgram).gl_program;
       if (gl_program) {
          this.gl.useProgram(gl_program);
          

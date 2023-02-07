@@ -1,4 +1,5 @@
 
+import { requestFileBlocking } from "../../../system/file/file.js";
 import OpenGLContext from "./open_gl_context.js";
 
 class OpenGLShader {
@@ -64,6 +65,19 @@ class OpenGLShader {
       }
       this._gl_shader = null;
       this._type = OpenGLShader.Type.NONE;
+   }
+   
+   static Load(path: string, type: OpenGLShader.Type, context: OpenGLContext): OpenGLShader {
+      const file = requestFileBlocking(path);
+      if (!file[0]) {
+         throw Error("Could not load shader: " + path);
+      }
+      let shader = new OpenGLShader();
+      if (!shader.initialize(file[1], type, context)) {
+         throw Error("Failed to initialize vertex shader: " + path + " of type: " + type);
+      }
+      
+      return shader;
    }
 }
 

@@ -13,34 +13,29 @@ export default class OpenGLShaderProgram {
    initialize(shaders: Array<OpenGLShader>, context: OpenGLContext): boolean
    {
       this._shaders = shaders;
+
+      this._gl_program = context.gl.createProgram();
+      if (!this._gl_program) {
+         console.log("Failed to create WebGL Program.");
+         return false;
+      }
       
-      var success = false;
-      const program = context.gl.createProgram();
-      if (program != null)
+      // Attach each shader
+      for (let shader of this._shaders)
       {
-         this._gl_program = program;
-         for (let shader of this._shaders)
+         if (shader.gl_shader)
          {
-            let shaderGL = shader as OpenGLShader;
-            if (shaderGL.gl_shader != null)
-            {
-               context.gl.attachShader(this._gl_program, shaderGL.gl_shader);
-            }
+            context.gl.attachShader(this._gl_program, shader.gl_shader);
          }
-         
-         context.gl.linkProgram(this._gl_program);
-         success = context.gl.getProgramParameter(this._gl_program, context.gl.LINK_STATUS)
-         if (!success) {
-            const info = context.gl.getProgramInfoLog(this._gl_program);
-            console.log("Failed to link program. Error:\n\n" + info);
-         }
-      }
-      else
-      {
-         console.log("Failed to create program.");
       }
       
+      // Link the program
+      context.gl.linkProgram(this._gl_program);
+      var success = context.gl.getProgramParameter(this._gl_program, context.gl.LINK_STATUS);
       if (!success) {
+         const info = context.gl.getProgramInfoLog(this._gl_program);
+         console.log("Failed to link program. Error:\n\n" + info);
+         
          this.release(context);
       }
       
@@ -67,5 +62,23 @@ export default class OpenGLShaderProgram {
    
    isValid(): boolean {
       return (this.gl_program != null && this.shaders.length > 0);
+   }
+   
+   static Load(vertPath: string, fragPath: string, context: OpenGLContext): OpenGLShaderProgram
+   {
+      let newProgram = new OpenGLShaderProgram();
+      
+      // Load the vert and frag shaders
+      let shaders = Array<OpenGLShader>();
+      shaders.push(OpenGLShader.Load(vertPath, OpenGLShader.Type.VERTEX, context));
+      shaders.push(OpenGLShader.Load(fragPath, OpenGLShader.Type.FRAGMENT, context));
+     
+      // Create the program from the shaders
+      if (!newProgram.initialize(shaders, context))
+      {
+         throw Error("Could not load shader program with vert shader: " + vertPath + " and frag path: " + fragPath);
+      }
+      
+      return newProgram;
    }
 }

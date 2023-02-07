@@ -1,7 +1,6 @@
 import Vector2 from "math/vector/vector2.js";
 import ColorRGB32 from "../color.js";
 import OpenGLContext from "./open_gl/open_gl_context.js";
-import OpenGLShaderProgram from "./open_gl/open_gl_shader_program.js";
 
 export default abstract class Renderer
 {
@@ -22,8 +21,6 @@ export default abstract class Renderer
    abstract makeContext(canvasElement: HTMLCanvasElement): OpenGLContext;
 
    abstract beginFrame(): void;
-
-   abstract createProgram(vertShaderSource: string, fragShaderSource: string): OpenGLShaderProgram | null;
    
    abstract drawTriangle2D(verts: Vector2[], colors: ColorRGB32[]): void;
 }

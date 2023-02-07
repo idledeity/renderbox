@@ -1,31 +1,24 @@
-import { requestFileBlocking } from "../../../system/file/file.js";
-import Renderer from "render/renderer/renderer.js";
-import OpenGLShaderProgram from "render/renderer/open_gl/open_gl_shader_program.js";
+import OpenGLShaderProgram from "../../renderer/open_gl/open_gl_shader_program.js";
+import OpenGLContext from "../../renderer/open_gl/open_gl_context.js";
 
-export default class VertexColorShader {
-   private _shader: OpenGLShaderProgram | null;
+export default class VertexColorProgram  {
+   private _program: OpenGLShaderProgram | null;
    
    constructor() {
+      this._program = null;
    }
    
-   initialize(renderer: Renderer): boolean
+   initialize(context: OpenGLContext): boolean
    {
-      const vertexColorVert = requestFileBlocking("../data/shaders/vertex_color.vert");
-      if (!vertexColorVert[0])
-      {
-         throw Error("Could not load solid color vertex shader.");
-      }
-      const vertexColorFrag = requestFileBlocking("../data/shaders/solid_color.frag");
-      if (!vertexColorFrag[0])
-      {
-         throw Error("Could not load solid color fragment shader.");
-      }
-      this._shader = renderer.createProgram(vertexColorVert[1], vertexColorFrag[1]);
+      this._program = OpenGLShaderProgram.Load(
+         "../data/shaders/vertex_color.vert",
+         "../data/shaders/solid_color.frag",
+         context);
       
       return true;
    }
    
    get shader(): OpenGLShaderProgram | null {
-      return this._shader;
+      return this._program;
    }
 }
